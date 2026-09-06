@@ -9,7 +9,10 @@ bajo; panel con las cifras del negocio; **login con roles**.
 **Base de datos:** H2 en archivo (local) · PostgreSQL (producción)
 **Despliegue:** Docker + Render (`render.yaml`)
 
-> 🌐 **Demo en vivo:** _pendiente de desplegar — ver sección "Despliegue"_
+> 🌐 **Demo en vivo:** **https://inventario-tienda-x7m4.onrender.com**
+> Entra con `vendedor` / `vendedor123` (rol limitado) o pide acceso de admin.
+> _Alojado en el plan gratuito de Render: la primera carga tras un rato de
+> inactividad puede tardar ~50 s en despertar._
 
 ---
 
@@ -113,9 +116,9 @@ una base de datos PostgreSQL.
 
 1. Crea una cuenta en <https://render.com> y conéctala con tu GitHub.
 2. **New → Blueprint** → elige este repositorio. Render lee `render.yaml`.
-3. Te pedirá el valor de **`APP_ADMIN_PASSWORD`** (la contraseña del admin en producción). Ponla ahí, no en el código.
-4. **Apply**. Render construye la imagen Docker, crea la base de datos y publica la app.
-5. Cuando termine, tendrás una URL `https://inventario-tienda.onrender.com`.
+3. Pon un nombre al Blueprint y el valor de **`APP_ADMIN_PASSWORD`** (la contraseña del admin en producción). Va ahí, no en el código.
+4. **Apply**. Render construye la imagen Docker, crea la base de datos PostgreSQL y publica la app (~3-8 min).
+5. Cuando el servicio quede **Live**, tendrás una URL pública.
 
 Variables de entorno que usa en producción (las gestiona Render):
 
