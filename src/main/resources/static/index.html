@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario · Gestión de tienda</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body>
+<header class="topbar">
+    <h1>📦 Inventario de tienda</h1>
+    <span class="topbar__sub">Sistema de gestión — Spring Boot + JavaScript</span>
+</header>
+
+<main class="container">
+
+    <!-- Panel de resumen -->
+    <section class="cards" id="cards">
+        <article class="card"><span class="card__label">Productos</span><span class="card__value" id="kpiProductos">–</span></article>
+        <article class="card card--warn"><span class="card__label">Stock bajo</span><span class="card__value" id="kpiStockBajo">–</span></article>
+        <article class="card"><span class="card__label">Unidades totales</span><span class="card__value" id="kpiUnidades">–</span></article>
+        <article class="card card--money"><span class="card__label">Valor del inventario</span><span class="card__value" id="kpiValor">–</span></article>
+    </section>
+
+    <!-- Pestañas -->
+    <nav class="tabs">
+        <button class="tab is-active" data-tab="productos">Productos</button>
+        <button class="tab" data-tab="stockBajo">Stock bajo</button>
+        <button class="tab" data-tab="movimientos">Movimientos</button>
+    </nav>
+
+    <!-- Tab: productos -->
+    <section id="tab-productos" class="tabpanel">
+        <div class="toolbar">
+            <input type="search" id="buscador" placeholder="Buscar por nombre…" autocomplete="off">
+            <button class="btn btn--primary" id="btnNuevo">+ Nuevo producto</button>
+        </div>
+        <div class="tabla-wrap">
+            <table class="tabla">
+                <thead>
+                <tr>
+                    <th>Nombre</th><th>Categoría</th><th class="num">Precio</th>
+                    <th class="num">Stock</th><th class="num">Mínimo</th>
+                    <th class="num">Valor</th><th></th>
+                </tr>
+                </thead>
+                <tbody id="tbodyProductos"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Tab: stock bajo -->
+    <section id="tab-stockBajo" class="tabpanel" hidden>
+        <p class="hint">Productos cuyo stock está en el mínimo o por debajo. Registra una entrada para reponerlos.</p>
+        <div class="tabla-wrap">
+            <table class="tabla">
+                <thead>
+                <tr><th>Nombre</th><th>Categoría</th><th class="num">Stock</th><th class="num">Mínimo</th><th></th></tr>
+                </thead>
+                <tbody id="tbodyStockBajo"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Tab: movimientos -->
+    <section id="tab-movimientos" class="tabpanel" hidden>
+        <p class="hint">Historial de entradas y salidas de stock. No se puede editar: es la trazabilidad.</p>
+        <div class="tabla-wrap">
+            <table class="tabla">
+                <thead>
+                <tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th class="num">Cantidad</th><th class="num">Stock final</th><th>Motivo</th></tr>
+                </thead>
+                <tbody id="tbodyMovimientos"></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Modal: crear / editar producto -->
+<dialog id="dlgProducto">
+    <form method="dialog" id="formProducto">
+        <h2 id="dlgProductoTitulo">Nuevo producto</h2>
+        <label>Nombre <input name="nombre" required maxlength="120"></label>
+        <label>Categoría <input name="categoria" maxlength="60" list="categorias"></label>
+        <datalist id="categorias"></datalist>
+        <div class="grid2">
+            <label>Precio (USD) <input name="precio" type="number" min="0" step="0.01" required></label>
+            <label>Stock actual <input name="stock" type="number" min="0" step="1" required></label>
+        </div>
+        <label>Stock mínimo (alerta) <input name="stockMinimo" type="number" min="0" step="1" required></label>
+        <p class="form-error" id="errProducto" hidden></p>
+        <menu>
+            <button value="cancel" class="btn">Cancelar</button>
+            <button value="ok" class="btn btn--primary" id="btnGuardarProducto">Guardar</button>
+        </menu>
+    </form>
+</dialog>
+
+<!-- Modal: registrar movimiento -->
+<dialog id="dlgMovimiento">
+    <form method="dialog" id="formMovimiento">
+        <h2>Registrar movimiento</h2>
+        <p class="dlg-producto" id="movProductoNombre"></p>
+        <input type="hidden" name="productoId">
+        <div class="grid2">
+            <label>Tipo
+                <select name="tipo">
+                    <option value="ENTRADA">Entrada (+)</option>
+                    <option value="SALIDA">Salida (−)</option>
+                </select>
+            </label>
+            <label>Cantidad <input name="cantidad" type="number" min="1" step="1" required></label>
+        </div>
+        <label>Motivo <input name="motivo" maxlength="200" placeholder="Compra a proveedor, venta, merma…"></label>
+        <p class="form-error" id="errMovimiento" hidden></p>
+        <menu>
+            <button value="cancel" class="btn">Cancelar</button>
+            <button value="ok" class="btn btn--primary">Registrar</button>
+        </menu>
+    </form>
+</dialog>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

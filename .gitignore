@@ -1,0 +1,29 @@
+# Compilados y build
+/target/
+*.class
+
+# Base de datos H2 generada en tiempo de ejecución
+/data/
+*.db
+*.mv.db
+*.trace.db
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+/bin/
+
+# Sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Maven wrapper (opcional dejarlo, aquí se ignora)
+!.mvn/wrapper/maven-wrapper.jar
