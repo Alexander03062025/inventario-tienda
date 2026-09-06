@@ -2,10 +2,28 @@
 
 /*
  * Frontend en JavaScript puro. Habla con la API REST de Spring Boot
- * usando fetch(). No usa ninguna librería externa.
+ * usando fetch(). Envía el token JWT en cada petición.
  */
 
 const API = "/api";
+
+// ---------- sesión ----------
+
+const token = localStorage.getItem("token");
+const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+
+// Sin token no se puede estar aquí: a la pantalla de login.
+if (!token || !usuario) {
+    location.replace("login.html");
+}
+
+const esAdmin = usuario && usuario.rol === "ADMIN";
+
+function cerrarSesion() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+    location.replace("login.html");
+}
 
 // ---------- utilidades ----------
 
@@ -23,13 +41,22 @@ function toast(mensaje, esError = false) {
     toastTimer = setTimeout(() => (t.hidden = true), 3000);
 }
 
-/** Envuelve fetch: lanza Error con el mensaje del backend si la respuesta falla. */
+/** Envuelve fetch: añade el token, y traduce errores del backend a Error. */
 async function api(ruta, opciones = {}) {
     const res = await fetch(API + ruta, {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+        },
         ...opciones,
     });
+
+    if (res.status === 401) {
+        cerrarSesion();
+        throw new Error("Sesión expirada");
+    }
     if (res.status === 204) return null;
+
     const cuerpo = await res.json().catch(() => ({}));
     if (!res.ok) {
         throw new Error(cuerpo.detail || cuerpo.message || "Error " + res.status);
@@ -64,6 +91,10 @@ async function cargarProductos() {
     for (const p of productosCache) {
         const tr = document.createElement("tr");
         if (p.stockBajo) tr.className = "fila-alerta";
+        const accionesAdmin = esAdmin
+            ? `<button class="btn btn--icon" data-editar="${p.id}">Editar</button>
+               <button class="btn btn--icon btn--danger" data-borrar="${p.id}">Borrar</button>`
+            : "";
         tr.innerHTML = `
             <td>${escapar(p.nombre)}</td>
             <td>${escapar(p.categoria || "—")}</td>
@@ -74,8 +105,7 @@ async function cargarProductos() {
             <td>
                 <div class="acciones">
                     <button class="btn btn--icon" data-mov="${p.id}">± Stock</button>
-                    <button class="btn btn--icon" data-editar="${p.id}">Editar</button>
-                    <button class="btn btn--icon btn--danger" data-borrar="${p.id}">Borrar</button>
+                    ${accionesAdmin}
                 </div>
             </td>`;
         tbody.appendChild(tr);
@@ -123,6 +153,27 @@ async function cargarMovimientos() {
     }
 }
 
+async function cargarUsuarios() {
+    const lista = await api("/usuarios");
+    const tbody = $("#tbodyUsuarios");
+    tbody.innerHTML = "";
+    for (const u of lista) {
+        const tr = document.createElement("tr");
+        const accion = u.username === usuario.username
+            ? '<span style="color:#6b7683">tú</span>'
+            : `<button class="btn btn--icon" data-toggle-usuario="${u.id}" data-activo="${u.activo}">
+                 ${u.activo ? "Desactivar" : "Activar"}
+               </button>`;
+        tr.innerHTML = `
+            <td>${escapar(u.username)}</td>
+            <td>${escapar(u.nombre)}</td>
+            <td><span class="badge">${u.rol}</span></td>
+            <td>${u.activo ? "Activo" : '<span style="color:#dc2626">Inactivo</span>'}</td>
+            <td>${accion}</td>`;
+        tbody.appendChild(tr);
+    }
+}
+
 function escapar(txt) {
     const d = document.createElement("div");
     d.textContent = txt;
@@ -138,6 +189,20 @@ async function refrescarTodo() {
     await Promise.all([cargarResumen(), cargarProductos()]);
 }
 
+// ---------- UI según sesión / rol ----------
+
+function aplicarSesionEnUI() {
+    $("#usuarioInfo").textContent = `${usuario.nombre} · ${usuario.rol}`;
+    $("#btnSalir").addEventListener("click", cerrarSesion);
+
+    if (esAdmin) {
+        document.querySelectorAll(".solo-admin").forEach((el) => (el.hidden = false));
+    } else {
+        // el vendedor no crea productos
+        $("#btnNuevo").hidden = true;
+    }
+}
+
 // ---------- pestañas ----------
 
 document.querySelectorAll(".tab").forEach((btn) => {
@@ -149,6 +214,7 @@ document.querySelectorAll(".tab").forEach((btn) => {
         $("#tab-" + destino).hidden = false;
         if (destino === "stockBajo") cargarStockBajo();
         if (destino === "movimientos") cargarMovimientos();
+        if (destino === "usuarios") cargarUsuarios();
     });
 });
 
@@ -184,7 +250,6 @@ function abrirFormProducto(producto = null) {
 }
 
 formProducto.addEventListener("submit", async (e) => {
-    // el botón "cancel" cierra el dialog sin llegar aquí (value=cancel)
     if (e.submitter && e.submitter.value === "cancel") return;
     e.preventDefault();
 
@@ -251,6 +316,43 @@ formMovimiento.addEventListener("submit", async (e) => {
     }
 });
 
+// ---------- modal usuario (solo admin) ----------
+
+const dlgUsuario = $("#dlgUsuario");
+const formUsuario = $("#formUsuario");
+
+const btnNuevoUsuario = $("#btnNuevoUsuario");
+if (btnNuevoUsuario) {
+    btnNuevoUsuario.addEventListener("click", () => {
+        formUsuario.reset();
+        $("#errUsuario").hidden = true;
+        dlgUsuario.showModal();
+    });
+}
+
+formUsuario.addEventListener("submit", async (e) => {
+    if (e.submitter && e.submitter.value === "cancel") return;
+    e.preventDefault();
+
+    const datos = {
+        username: formUsuario.username.value.trim(),
+        nombre: formUsuario.nombre.value.trim(),
+        password: formUsuario.password.value,
+        rol: formUsuario.rol.value,
+    };
+
+    try {
+        await api("/usuarios", { method: "POST", body: JSON.stringify(datos) });
+        toast("Usuario creado");
+        dlgUsuario.close();
+        cargarUsuarios();
+    } catch (err) {
+        const p = $("#errUsuario");
+        p.textContent = err.message;
+        p.hidden = false;
+    }
+});
+
 // ---------- acciones de las tablas (delegación de eventos) ----------
 
 document.addEventListener("click", async (e) => {
@@ -280,8 +382,20 @@ document.addEventListener("click", async (e) => {
             }
         }
     }
+
+    if (btn.dataset.toggleUsuario) {
+        const activar = btn.dataset.activo !== "true";
+        try {
+            await api(`/usuarios/${btn.dataset.toggleUsuario}/estado?activo=${activar}`, { method: "PATCH" });
+            toast(activar ? "Usuario activado" : "Usuario desactivado");
+            cargarUsuarios();
+        } catch (err) {
+            toast(err.message, true);
+        }
+    }
 });
 
 // ---------- arranque ----------
 
+aplicarSesionEnUI();
 refrescarTodo().catch((err) => toast("No se pudo cargar: " + err.message, true));

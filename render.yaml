@@ -1,0 +1,40 @@
+# Blueprint de Render: describe la infraestructura de la app.
+# En Render: New -> Blueprint -> conectar este repo. Crea el servicio web
+# y la base de datos PostgreSQL automáticamente.
+# Docs: https://render.com/docs/blueprint-spec
+
+databases:
+  - name: inventario-db
+    plan: free
+    databaseName: inventario
+    user: inventario
+
+services:
+  - type: web
+    name: inventario-tienda
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /login.html
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # Conexión a la base de datos (Render la rellena sola)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: inventario-db
+          property: connectionString
+
+      # Clave para firmar los JWT: Render genera una aleatoria y segura
+      - key: APP_JWT_SECRET
+        generateValue: true
+
+      # Usuario admin inicial. La contraseña se define en el panel de Render
+      # (Environment -> APP_ADMIN_PASSWORD), NO se guarda en el repo.
+      - key: APP_ADMIN_USERNAME
+        value: admin
+      - key: APP_ADMIN_PASSWORD
+        sync: false
+      - key: APP_ADMIN_NOMBRE
+        value: Administrador

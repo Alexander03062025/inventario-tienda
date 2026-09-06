@@ -2,6 +2,8 @@ package com.alexander.inventario.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,8 +24,8 @@ public class ManejadorGlobalErrores {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(StockInsuficienteException.class)
-    ProblemDetail stockInsuficiente(StockInsuficienteException ex) {
+    @ExceptionHandler({StockInsuficienteException.class, ValidacionException.class})
+    ProblemDetail conflicto(RuntimeException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
@@ -34,5 +36,18 @@ public class ManejadorGlobalErrores {
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .collect(Collectors.joining("; "));
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detalles);
+    }
+
+    /** Usuario o contraseña incorrectos al hacer login. */
+    @ExceptionHandler(BadCredentialsException.class)
+    ProblemDetail credencialesInvalidas(BadCredentialsException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos");
+    }
+
+    /** Autenticado, pero sin permiso para esta acción (rol insuficiente). */
+    @ExceptionHandler(AccessDeniedException.class)
+    ProblemDetail accesoDenegado(AccessDeniedException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
+                "No tienes permiso para realizar esta acción");
     }
 }

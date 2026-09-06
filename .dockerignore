@@ -1,0 +1,9 @@
+target/
+data/
+*.log
+.git/
+.gitignore
+.idea/
+.vscode/
+docs/
+README.md

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión · Inventario</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body class="login-body">
+<main class="login-card">
+    <h1>📦 Inventario de tienda</h1>
+    <p class="login-sub">Inicia sesión para continuar</p>
+
+    <form id="formLogin">
+        <label>Usuario
+            <input name="username" autocomplete="username" required autofocus>
+        </label>
+        <label>Contraseña
+            <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <p class="form-error" id="errLogin" hidden></p>
+        <button class="btn btn--primary" id="btnEntrar" type="submit">Entrar</button>
+    </form>
+
+    <p class="login-demo">
+        Demo: <code>admin / admin123</code> (ADMIN) · <code>vendedor / vendedor123</code> (VENDEDOR)
+    </p>
+</main>
+
+<script src="js/login.js"></script>
+</body>
+</html>

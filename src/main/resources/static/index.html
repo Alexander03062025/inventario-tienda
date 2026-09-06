@@ -9,8 +9,14 @@
 </head>
 <body>
 <header class="topbar">
-    <h1>📦 Inventario de tienda</h1>
-    <span class="topbar__sub">Sistema de gestión — Spring Boot + JavaScript</span>
+    <div>
+        <h1>📦 Inventario de tienda</h1>
+        <span class="topbar__sub">Sistema de gestión — Spring Boot + JavaScript</span>
+    </div>
+    <div class="topbar__user">
+        <span id="usuarioInfo"></span>
+        <button class="btn btn--icon" id="btnSalir">Cerrar sesión</button>
+    </div>
 </header>
 
 <main class="container">
@@ -28,6 +34,7 @@
         <button class="tab is-active" data-tab="productos">Productos</button>
         <button class="tab" data-tab="stockBajo">Stock bajo</button>
         <button class="tab" data-tab="movimientos">Movimientos</button>
+        <button class="tab solo-admin" data-tab="usuarios" hidden>Usuarios</button>
     </nav>
 
     <!-- Tab: productos -->
@@ -75,6 +82,22 @@
             </table>
         </div>
     </section>
+
+    <!-- Tab: usuarios (solo ADMIN) -->
+    <section id="tab-usuarios" class="tabpanel" hidden>
+        <div class="toolbar">
+            <p class="hint" style="flex:1;margin:0">Usuarios del sistema. Solo un ADMIN ve esta sección.</p>
+            <button class="btn btn--primary" id="btnNuevoUsuario">+ Nuevo usuario</button>
+        </div>
+        <div class="tabla-wrap">
+            <table class="tabla">
+                <thead>
+                <tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody id="tbodyUsuarios"></tbody>
+            </table>
+        </div>
+    </section>
 </main>
 
 <!-- Modal: crear / editar producto -->
@@ -117,6 +140,29 @@
         <menu>
             <button value="cancel" class="btn">Cancelar</button>
             <button value="ok" class="btn btn--primary">Registrar</button>
+        </menu>
+    </form>
+</dialog>
+
+<!-- Modal: crear usuario -->
+<dialog id="dlgUsuario">
+    <form method="dialog" id="formUsuario">
+        <h2>Nuevo usuario</h2>
+        <label>Usuario <input name="username" required minlength="3" maxlength="40"></label>
+        <label>Nombre <input name="nombre" required maxlength="80"></label>
+        <div class="grid2">
+            <label>Contraseña <input name="password" type="password" required minlength="6"></label>
+            <label>Rol
+                <select name="rol">
+                    <option value="VENDEDOR">Vendedor</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+            </label>
+        </div>
+        <p class="form-error" id="errUsuario" hidden></p>
+        <menu>
+            <button value="cancel" class="btn">Cancelar</button>
+            <button value="ok" class="btn btn--primary">Crear</button>
         </menu>
     </form>
 </dialog>

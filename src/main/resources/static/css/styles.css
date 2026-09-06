@@ -28,9 +28,49 @@ body {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 .topbar h1 { margin: 0; font-size: 20px; }
 .topbar__sub { color: var(--text-soft); font-size: 13px; }
+.topbar__user { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-soft); }
+
+/* --- Pantalla de login --- */
+.login-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+}
+.login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 32px;
+    width: min(380px, 100%);
+}
+.login-card h1 { margin: 0 0 4px; font-size: 20px; }
+.login-sub { color: var(--text-soft); font-size: 14px; margin: 0 0 20px; }
+.login-card label { display: block; margin-bottom: 14px; font-size: 13px; color: var(--text-soft); }
+.login-card input {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 9px 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+}
+.login-card .btn--primary { width: 100%; margin-top: 4px; padding: 10px; }
+.login-demo { margin: 18px 0 0; font-size: 12px; color: var(--text-soft); line-height: 1.7; }
+.login-demo code { background: var(--bg); padding: 1px 5px; border-radius: 4px; }
 
 .container { max-width: 960px; margin: 0 auto; padding: 24px; }
 
