@@ -42,16 +42,28 @@ public class MovimientoInventario {
 
     public MovimientoInventario(Producto producto, TipoMovimiento tipo, int cantidad,
                                 String motivo, int stockResultante) {
+        this(producto, tipo, cantidad, motivo, stockResultante, null);
+    }
+
+    /**
+     * @param fecha si es null se usa el momento actual. Permite registrar
+     *              movimientos históricos (por ejemplo, importar un cuaderno).
+     */
+    public MovimientoInventario(Producto producto, TipoMovimiento tipo, int cantidad,
+                                String motivo, int stockResultante, LocalDateTime fecha) {
         this.producto = producto;
         this.tipo = tipo;
         this.cantidad = cantidad;
         this.motivo = motivo;
         this.stockResultante = stockResultante;
+        this.fecha = fecha;
     }
 
     @PrePersist
     void alCrear() {
-        this.fecha = LocalDateTime.now();
+        if (this.fecha == null) {
+            this.fecha = LocalDateTime.now();
+        }
     }
 
     // --- getters ---

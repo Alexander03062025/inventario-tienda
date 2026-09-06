@@ -83,7 +83,7 @@ Todas las rutas `/api/**` (menos `/api/auth/**`) requieren la cabecera
 | PUT | `/api/productos/{id}` | ADMIN | Actualiza un producto |
 | DELETE | `/api/productos/{id}` | ADMIN | Elimina un producto y su historial |
 | GET | `/api/movimientos` | autenticado | Historial de entradas/salidas |
-| POST | `/api/movimientos` | autenticado | Registra un movimiento y ajusta el stock |
+| POST | `/api/movimientos` | autenticado | Registra un movimiento y ajusta el stock (campo opcional `fecha` para importar históricos) |
 | GET | `/api/resumen` | autenticado | Totales, valor del inventario y alertas |
 | GET | `/api/usuarios` | ADMIN | Lista de usuarios |
 | POST | `/api/usuarios` | ADMIN | Crea un usuario |

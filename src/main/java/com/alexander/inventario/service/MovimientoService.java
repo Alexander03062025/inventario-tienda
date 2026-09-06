@@ -48,7 +48,7 @@ public class MovimientoService {
         productoRepo.save(producto);
 
         MovimientoInventario mov = new MovimientoInventario(
-                producto, datos.tipo(), datos.cantidad(), datos.motivo(), stockNuevo);
+                producto, datos.tipo(), datos.cantidad(), datos.motivo(), stockNuevo, datos.fecha());
         return movimientoRepo.save(mov);
     }
 
